@@ -6,35 +6,34 @@ void makeBoard();
 void drawBoard();
 void editBoard();
 
-class Ship{
+/*class Ship{
     public:
     char startingRow;
     char endingRow;
     int startingCol;
     int endingCol;
     int size;
-    Ship(char startRow, char endRow, int startCol, int endCol, int uSize);
+    
+    Ship(char startRow, int startCol, int uSize);
    
 };
 
 
-Ship::Ship(char startRow, char endRow, int startCol, int endCol, int uSize){
+Ship::Ship(char startRow, int startCol, int uSize){
     startingRow = startRow;
-    endingRow = endRow;
     startingCol = startCol;
-    endingCol = endCol;
     size = uSize;
-}
+}*/
 
 int main()
 {
     instructions();
     drawBoard();
 
-    char shipType, startRow, endRow, orientation;
-    int startCol, endCol, uSize;
+    char shipType, startRow, endRow, orientation, userOcean[10][10], direction;
+    int startCol, endCol, uSize, rowInp;
     
-   /* do{
+    do{
         std::cout<<"Which ship would you like to move?"<<"\n";
         std::cout<<"Please type \"A\", for Airship, \"B\" for Battleship, \"C\" for Cruiser, \"D\" for Destroyer, or \"S\" for Submarine"<<'\n';
         std::cout<<"When You are finished moving your ships, please type \"F\""<<'\n';
@@ -49,26 +48,60 @@ int main()
                 std::cout<<"Which orientation would you like? Type \'H\' for horizontal or \'V\' for vertical: ";
                 std::cin>>orientation;
                 (char)toupper(orientation);
-            } while (orientation != 'H' || orientation != 'V');    
+            } while (orientation != 'H' && orientation != 'V');    
+            
             if (orientation == 'H'){
-                
-                do{
-                std::cout<<"Which row would you like the ship to rest in (from A-J)?: ";
-                std::cin>>startRow;
-                (char)toupper(startRow);
-                } while (startRow != 'A' || startRow != 'B' || startRow != 'C' || startRow != 'D' || startRow != 'E' || startRow != 'F' || startRow != 'G' || startRow != 'H' || startRow != 'I' || startRow != 'J');
-                
-                do{
-                    std::cout<<"Which column would you like the ship to start in (starting with the back of the ship from 1-10)?: ";
-                    std::cin>>startCol;
-                } while (startCol>10 || startCol<10);
 
-                if (startCol>uSize){
-                    endCol = startCol - uSize;
+                std::cout<<"Which row would you like the ship to be in (from A-J)?: ";
+                std::cin>>rowInp;
+                rowInp = toupper(rowInp);
+                startRow = rowInp - 64;
+            
+                while ((startRow < 1) || (startRow > 10)){
+                    std::cout<<"You have entered an invalid char. Please enter a character (A-J): "<<std::endl;
+                    std::cin>>rowInp;
+                    rowInp = toupper(rowInp);
+                    startRow = rowInp - 64;
                 }
-                else if (startCol<uSize){
-                    endCol = startCol + uSize;
+
+                std::cout<<"You picked row: ";
+                std::cout<<startRow<<std::endl;
+
+                std::cout<<"Which column would you like the back of the ship to be in?: ";
+                std::cin>>startCol;
+
+                while (startCol < 1 || startCol > 10)
+                {
+                    std::cout<<"You have entered an invalid char. Please enter a character (A-J): "<<std::endl;
+                    std::cin>>startCol;
                 }
+
+                std::cout<<"You picked column: "<<startCol<<std::endl;
+
+                if (startCol > 5){
+                    endCol = startCol - 5;
+                }
+                else if (startCol < 5){
+                    endCol = startCol + 5;
+                }
+                else{
+                    do{
+                    std::cout<<"which direction would you like to the ship to lay in? Left (L) or Right (R)?: ";
+                    std::cin>>direction;
+                    (char)toupper(direction);
+                    }while (direction != 'L' || direction !='R');
+
+                    if (direction = 'L')
+                    {
+                        endCol = startCol - 5;
+                    }
+                    else
+                    {
+                        endCol = startCol + 5;
+                    }
+                }
+
+                editBoard(userOcean, shipType, startRow, startCol, endCol, uSize, orientation);
             }
 
             shipType = '+';
@@ -97,42 +130,25 @@ int main()
             std::cout<<"That is not a valid input :/"<<'\n';
         }
 
-    } while (shipType!='A' || shipType!='B' || shipType!='C' || shipType!='D' || shipType!='S' || shipType!='F');
-
-    */
+    } while (shipType!='A' && shipType!='B' && shipType!='C' && shipType!='D' && shipType!='S' && shipType!='F');
     
     return 0;
 }
 
-void makeBoard(char ocean[10][10]){
-    int i,j;
 
-    for (i=0; i<10; i++)
-    {
-        for (j=0; j<10; j++)
-        {
-            ocean[i][j]='E';
+void editBoard(char ocean[10][10], char shipType, int startRow, int startCol, int endCol, int size, char orientation){
+    // need to implement a board check that sees if there is enough space in row to fit ship type. Will make another method for this.
+    // also realizng that this does not permanently edit the array. will try to find a way to edit it without declaring globally.
+    if (orientation = 'H'){
+        for (int i=startCol; i<=endCol; i++){
+            ocean[startRow][i] = shipType;
         }
     }
+
+
 }
 
-void editBoard(char ocean[10][10], char shipType){
-    int startCol, startRow, size;
-    char direction;
-
-    if (shipType == 'A'){
-        size = 5;
-        std::cout<<"What direction would you like the Aircraft to face; vertical (V) or horizontal (H)? ";
-        std::cin>>direction;
-        if (direction == 'H'){
-            std::cout<<"which row would you like the Aircraft to be in (A-J)? ";
-            std::cin>>startRow;
-            
-        }
-
-    }
-}
-void drawBoard()
+void drawBoard(char ocean[10][10])
 {
     char ocean[10][10]={};
 
