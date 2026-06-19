@@ -3,9 +3,9 @@
 
 void instructions();
 void makeBoard();
-void drawBoard();
-void editBoardHorizontal();
-void editBoardVertical();
+void drawBoard(char ocean[10][10]);
+void editBoardHorizontal(char ocean[10][10], char shipType, int startRow, int startCol, int endCol, int size, char orientation);
+void editBoardVertical(char ocean[10][10], char shipType, int startRow, int endRow, int startCol, int size, char orientation);
 
 /*class Ship{
     public:
@@ -26,20 +26,33 @@ Ship::Ship(char startRow, int startCol, int uSize){
     size = uSize;
 }*/
 
+struct Board {
+    char grid[10][10];
+};
+
+Board createBoard() {
+    Board b;
+    for (int r = 0; r < 10; r++)
+        for (int c = 0; c < 10; c++)
+            b.grid[r][c] = ' ';
+    return b;
+}
+
 int main()
 {
     instructions();
-    drawBoard();
-
-    char shipType, startRow, endRow, orientation, userOcean[10][10], direction;
+    Board userOcean = createBoard();
+    drawBoard(userOcean.grid);
+    char shipType, startRow, endRow, orientation, direction;
     int startCol, endCol, uSize, rowInp;
+    
     
     do{
         std::cout<<"Which ship would you like to move?"<<"\n";
         std::cout<<"Please type \"A\", for Airship, \"B\" for Battleship, \"C\" for Cruiser, \"D\" for Destroyer, or \"S\" for Submarine"<<'\n';
         std::cout<<"When You are finished moving your ships, please type \"F\""<<'\n';
         std::cin>>shipType;
-        (char)toupper(shipType);
+        shipType = (char)toupper(shipType);
 
         if (shipType=='A')
         {
@@ -101,7 +114,7 @@ int main()
                         endCol = startCol + 5;
                     }
                 }
-                editBoardHorizontal(userOcean, shipType, startRow, startCol, endCol, uSize, orientation);
+                editBoardHorizontal(userOcean.grid, shipType, startRow, startCol, endCol, uSize, orientation);
             }
 
             if (orientation == 'V'){
@@ -153,8 +166,11 @@ int main()
                 }
                 
                 //figure out why this is red
-                editBoardVertical(userOcean, shipType, startRow, endRow, startCol, uSize, orientation);
+                editBoardVertical(userOcean.grid, shipType, startRow, endRow, startCol, uSize, orientation);
             }
+
+            drawBoard(userOcean.grid);
+        }
         else if(shipType=='B')
         {
             std::cout<<"You have chosen: The Battleship"<<'\n';
@@ -185,6 +201,7 @@ int main()
 }
 
 
+
 void editBoardHorizontal(char ocean[10][10], char shipType, int startRow, int startCol, int endCol, int size, char orientation){
     // need to implement a board check that sees if there is enough space in row to fit ship type. Will make another method for this.
     // also realizng that this does not permanently edit the array. will try to find a way to edit it without declaring globally.
@@ -198,8 +215,6 @@ void editBoardVertical(char ocean[10][10], char shipType, int startRow, int endR
 
 void drawBoard(char ocean[10][10])
 {
-    char ocean[10][10]={};
-
     int i, j;
 
     std::cout << "Your Ship Setup:\n";
@@ -239,8 +254,8 @@ void drawBoard(char ocean[10][10])
             }
         std::cout<<"| ";
         for (j = 0; j < 10; j++) {
-            if (ocean[i][j]==' '){
-                std::cout<<"  | ";
+            if (ocean[i][j] !=' '){
+                std::cout<<ocean[i][j]<<" | ";
             }
             else{
                 std::cout<<"~ | ";
