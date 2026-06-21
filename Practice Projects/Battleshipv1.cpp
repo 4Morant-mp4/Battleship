@@ -1,30 +1,17 @@
 #include <iostream>
 #include <vector>
 
+// 6/21/26 - Everything works fine. Need to turn the ship placement into a method so i can just call the method for each ship type.
+// Also need to make a checking system to see if there is a ship in the spot where the user wants to place their ship
+// Also need to add a "clear ship" option
+// Also need to fix the loop that should allow user to stop arranging ships
+// Finally, figure out how to randomize a computer's ship board. Might be easier to have preset boards than do rng.
+
 void instructions();
 void makeBoard();
 void drawBoard(char ocean[10][10]);
-void editBoardHorizontal(char ocean[10][10], char shipType, int startRow, int startCol, int endCol, int size, char orientation);
-void editBoardVertical(char ocean[10][10], char shipType, int startRow, int endRow, int startCol, int size, char orientation);
-
-/*class Ship{
-    public:
-    char startingRow;
-    char endingRow;
-    int startingCol;
-    int endingCol;
-    int size;
-    
-    Ship(char startRow, int startCol, int uSize);
-   
-};
-
-
-Ship::Ship(char startRow, int startCol, int uSize){
-    startingRow = startRow;
-    startingCol = startCol;
-    size = uSize;
-}*/
+void editBoardHorizontal(char ocean[10][10], char shipType, int startRow, int startCol, int endCol, int size, char orientation, char direction);
+void editBoardVertical(char ocean[10][10], char shipType, int startRow, int endRow, int startCol, int size, char orientation, char direction);
 
 struct Board {
     char grid[10][10];
@@ -61,113 +48,103 @@ int main()
             do{
                 std::cout<<"Which orientation would you like? Type \'H\' for horizontal or \'V\' for vertical: ";
                 std::cin>>orientation;
-                (char)toupper(orientation);
+                orientation=(char)toupper(orientation);
             } while (orientation != 'H' && orientation != 'V');    
             
             if (orientation == 'H'){
 
+                do{
                 std::cout<<"Which row would you like the ship to be in (from A-J)?: ";
                 std::cin>>rowInp;
                 rowInp = toupper(rowInp);
                 startRow = rowInp - 64;
-                
-                while ((startRow < 1) || (startRow > 10)){
-                    std::cout<<"You have entered an invalid char. Please enter a character (A-J): "<<std::endl;
-                    std::cin>>rowInp;
-                    rowInp = toupper(rowInp);
-                    startRow = rowInp - 64;
-                }
+                }while ((startRow < 1) || (startRow > 10));
 
                 std::cout<<"You picked row: ";
-                std::cout<<startRow<<std::endl;
+                std::cout<<rowInp<<std::endl;
 
-                std::cout<<"Which column would you like the back of the ship to be in?: ";
-                std::cin>>startCol;
-
-                while (startCol < 1 || startCol > 10)
-                {
-                    std::cout<<"You have entered an invalid char. Please enter a character (A-J): "<<std::endl;
-                    std::cin>>startCol;
-                }
+                do{
+                   std::cout<<"Which column would you like the back of the ship to be in (1-10)?: ";
+                    std::cin>>startCol; 
+                } while (startCol <1 || startCol > 10);
+                
 
                 std::cout<<"You picked column: "<<startCol<<std::endl;
 
-                if (startCol > 5){
+                if (startCol > 6){
+                    direction = 'L';
                     endCol = startCol - 5;
                 }
                 else if (startCol < 5){
+                    direction = 'R';
                     endCol = startCol + 5;
                 }
                 else{
                     do{
                     std::cout<<"which direction would you like to the ship to lay in? Left (L) or Right (R)?: ";
                     std::cin>>direction;
-                    (char)toupper(direction);
-                    }while (direction != 'L' || direction !='R');
+                    direction = (char)toupper(direction);
+                    }while (direction != 'L' && direction !='R');
 
-                    if (direction = 'L')
+                    if (direction == 'L')
                     {
-                        endCol = startCol - 5;
+                        startCol++;
+                        endCol = startCol-5;
                     }
                     else
                     {
-                        endCol = startCol + 5;
+                        endCol = startCol+5;
                     }
                 }
-                editBoardHorizontal(userOcean.grid, shipType, startRow, startCol, endCol, uSize, orientation);
+                editBoardHorizontal(userOcean.grid, shipType, startRow, startCol, endCol, uSize, orientation, direction);
             }
 
             if (orientation == 'V'){
 
+                do{
                 std::cout<<"Which column would you like the ship to be in (from 1-10)?: ";
                 std::cin>>startCol;
-            
-                while ((startCol < 1) || (startCol > 10)){
-                    std::cout<<"You have entered an invalid number. Please enter a column (1-10): "<<std::endl;
-                    std::cin>>startCol;
-                }
+                }while ((startCol < 1) || (startCol > 10));
 
                 std::cout<<"You picked column: ";
                 std::cout<<startCol<<std::endl;
 
-                std::cout<<"Which row would you like the ship to be in (from A-J)?: ";
+                do{
+                std::cout<<"Which row would you like the back of the ship to be in (from A-J)?: ";
                 std::cin>>rowInp;
                 rowInp = toupper(rowInp);
                 startRow = rowInp - 64;
-                
-                while ((startRow < 1) || (startRow > 10)){
-                    std::cout<<"You have entered an invalid char. Please enter a character (A-J): "<<std::endl;
-                    std::cin>>rowInp;
-                    rowInp = toupper(rowInp);
-                    startRow = rowInp - 64;
-                }
+                }while ((startRow < 1) || (startRow > 10));
 
                 std::cout<<"You picked row: "<<startRow<<std::endl;
 
-                if (startRow > 5){
+                if (startRow > 6){
+                    direction = 'U';
                     endRow = startRow - 5;
                 }
                 else if (startRow < 5){
+                    direction = 'D';
                     endRow = startRow + 5;
                 }
                 else{
                     do{
-                    std::cout<<"which direction would you like to the ship to lay in? Up (U) or Down (D)?: ";
+                    std::cout<<"which direction would you like the ship to lay in? Up (U) or Down (D)?: ";
                     std::cin>>direction;
-                    (char)toupper(direction);
+                    direction = (char)toupper(direction);
                     }while (direction != 'U' && direction !='D');
 
-                    if (direction = 'U')
+                    if (direction == 'U')
                     {
-                        endRow = startRow - 5;
+                        startRow++;
+                        endRow = startRow-5;
                     }
                     else
                     {
-                        endRow = startRow + 5;
+                        endRow = startRow+5;
                     }
                 }
                 
-                editBoardVertical(userOcean.grid, shipType, startRow, endRow, startCol, uSize, orientation);
+                editBoardVertical(userOcean.grid, shipType, startRow, endRow, startCol, uSize, orientation, direction);
             }
 
             drawBoard(userOcean.grid);
@@ -203,13 +180,24 @@ int main()
 
 
 
-void editBoardHorizontal(char ocean[10][10], char shipType, int startRow, int startCol, int endCol, int size, char orientation){
+void editBoardHorizontal(char ocean[10][10], char shipType, int startRow, int startCol, int endCol, int size, char orientation, char direction){
     // need to implement a board check that sees if there is enough space in row to fit ship type. Will make another method for this.
-    for (int i=startCol; i<=endCol; i++) ocean[startRow][i] = shipType;
+    if (direction == 'L'){
+        for (int i=endCol-1; i<startCol-1; i++) ocean[startRow-1][i] = shipType;
+    }
+    else{
+     for (int i=startCol-1; i<endCol-1; i++) ocean[startRow-1][i] = shipType;   
+    }
+    
 }
-void editBoardVertical(char ocean[10][10], char shipType, int startRow, int endRow, int startCol, int size, char orientation){
+void editBoardVertical(char ocean[10][10], char shipType, int startRow, int endRow, int startCol, int size, char orientation, char direction){
     // need to implement a board check that sees if there is enough space in row to fit ship type. Will make another method for this.
-    for (int i=startRow; i<=endRow; i++) ocean[i][startCol] = shipType;
+    if (direction == 'U'){
+        for (int i=endRow-1; i<startRow-1; i++) ocean[i][startCol-1] = shipType;
+    }
+    else{
+        for (int i=startRow-1; i<endRow-1; i++) ocean[i][startCol-1] = shipType;  
+    }
 }
 
 void drawBoard(char ocean[10][10])
@@ -254,11 +242,10 @@ void drawBoard(char ocean[10][10])
         std::cout<<"| ";
         for (j = 0; j < 10; j++) {
             if (ocean[i][j] !=' '){
-                //for some reason this is pushing the rows down a row
                 std::cout<<ocean[i][j]<<" | ";
             }
             else{
-                std::cout<<"~ | ";
+                std::cout<<"  | ";
             }
         }
         std::cout<<"\n"<<"    "<<"- - - - - - - - - - - - - - - - - - - - -";
