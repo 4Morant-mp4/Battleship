@@ -1,16 +1,20 @@
 #include <iostream>
-#include <vector>
+#include <limits>
 
-// 6/23/26 - Turned the ship placement into a method. Now able to move all ships.
-// need to fix the loop so that the user can infinitely place their ships until canceled
-// also need to implement a "check space" and "clear ship" method.
+// 6/24/26 - The loop is now fixed. Players can put ships infinitely if they choose or continue the game.
+// Fixed some small placement issues and a previous misspelling
+// Also if the player tries to move a ship already on the board, the code will stop them
+// Code will also stop the player if they have moved all their ships. The method used is a bit annoying for the player but it's a good start
+// Next i need to design the isValidSpace() method to ensure no overlapping ships
+// After that, we can begin coding a simple AI that randomly places ships.
 
 void instructions();
-void makeBoard();
 void drawBoard(char ocean[10][10]);
 void editBoardHorizontal(char ocean[10][10], char shipType, int startRow, int startCol, int endCol, int size, char orientation, char direction);
 void editBoardVertical(char ocean[10][10], char shipType, int startRow, int endRow, int startCol, int size, char orientation, char direction);
 void moveShip(char ocean[10][10], char shipType, int size);
+bool isOnBoard(char ocean[10][10], char ship);
+void clear(char ocean[10][10], char shipType);
 
 struct Board {
     char grid[10][10];
@@ -29,57 +33,93 @@ int main()
     instructions();
     Board userOcean = createBoard();
     drawBoard(userOcean.grid);
-    char shipType, rowInp, orientation, direction;
+    char shipType, rowInp, orientation, direction, clearShip, proceed;
     int startRow, endRow, startCol, endCol, uSize;
     
-    
     do{
-        std::cout<<"Which ship would you like to move?"<<"\n";
-        std::cout<<"Please type \"A\", for Airship, \"B\" for Battleship, \"C\" for Cruiser, \"D\" for Destroyer, or \"S\" for Submarine"<<'\n';
-        std::cout<<"When You are finished moving your ships, please type \"F\""<<'\n';
-        std::cin>>shipType;
-        shipType = (char)toupper(shipType);
+        do{
+            std::cout<<"Which ship would you like to move?"<<"\n";
+            std::cout<<"Please type \"A\", for Airship, \"B\" for Battleship, \"C\" for Cruiser, \"D\" for Destroyer, or \"S\" for Submarine"<<'\n';
+            std::cout<<"When You are finished moving your ships, please type \"F\""<<'\n';
+            std::cout<<"If you would like to clear a ship, please type \"X\""<<'\n';
+            std::cin>>shipType;
+            shipType = (char)toupper(shipType);
+            
+            if (isOnBoard(userOcean.grid, shipType)){
+                do{
+                    std::cout<<"This ship is already on the board."<<'\n'<<"Would you like to clear the ship? (Y or N)\n";
+                    std::cin>>clearShip;
+                    clearShip = (char)toupper(clearShip);
+                }while(clearShip != 'Y' && clearShip != 'N');
+                
+                if (clearShip == 'Y') clear(userOcean.grid, shipType);
+                else break;
+                
+            }
+            if (shipType=='A')
+            {
+                std::cout<<"You have chosen: The Aircraft Carrier"<<'\n';
+                uSize = 5;
+                moveShip(userOcean.grid, shipType, uSize);
+            }
+            else if(shipType=='B')
+            {
+                std::cout<<"You have chosen: The Battleship"<<'\n';
+                uSize = 4;
+                moveShip(userOcean.grid, shipType, uSize);
+            }
+            else if(shipType=='C')
+            {
+                std::cout<<"You have chosen: The Cruiser"<<'\n';
+                uSize = 3;
+                moveShip(userOcean.grid, shipType, uSize);
+            }
+            else if(shipType=='D')
+            {
+                std::cout<<"You have chosen: The Destroyer"<<'\n';
+                uSize = 3;
+                moveShip(userOcean.grid, shipType, uSize);
+            }
+            else if (shipType =='S')
+            {
+                std::cout<<"You have chosen: The Submarine"<<'\n';
+                uSize = 2;
+                moveShip(userOcean.grid, shipType, uSize);
+            }
+            else if (shipType == 'X')
+            {
+                do{
+                std::cout<<"Which ship would you like to clear?"<<'\n';
+                std::cout<<"Please type \"A\", for Airship, \"B\" for Battleship, \"C\" for Cruiser, \"D\" for Destroyer, or \"S\" for Submarine"<<'\n';
+                std::cin>>clearShip;
+                clearShip = (char)toupper(clearShip);
+                clear(userOcean.grid, clearShip);
+                }while(clearShip!='A' && clearShip!='B' && clearShip!='C' && clearShip!='D' && clearShip!='S');
+            }
+            else if (shipType == 'F')
+            {
+                break;
+            }
+            else
+            {
+                std::cout<<"That is not a valid input :/"<<'\n';
+            }
 
-        if (shipType=='A')
-        {
-            std::cout<<"You have chosen: The Aircraft Carrier"<<'\n';
-            uSize = 5;
-            moveShip(userOcean.grid, shipType, uSize);
-        }
-        else if(shipType=='B')
-        {
-            std::cout<<"You have chosen: The Battleship"<<'\n';
-            uSize = 4;
-            moveShip(userOcean.grid, shipType, uSize);
-        }
-        else if(shipType=='C')
-        {
-            std::cout<<"You have chosen: The Cruiser"<<'\n';
-            uSize = 3;
-            moveShip(userOcean.grid, shipType, uSize);
-        }
-        else if(shipType=='D')
-        {
-            std::cout<<"You have chosen: The Destroyer"<<'\n';
-            uSize = 3;
-            moveShip(userOcean.grid, shipType, uSize);
-        }
-        else if (shipType =='S')
-        {
-            std::cout<<"You have chosen: The Suubmarine"<<'\n';
-            uSize = 2;
-            moveShip(userOcean.grid, shipType, uSize);
-        }
-        else if(shipType=='F')
-        {
-            break;
-        }
-        else
-        {
-            std::cout<<"That is not a valid input :/"<<'\n';
-        }
+        } while (shipType!='A' && shipType!='B' && shipType!='C' && shipType!='D' && shipType!='S');
+        
+        if (isOnBoard(userOcean.grid, 'A') && isOnBoard(userOcean.grid, 'B') && isOnBoard(userOcean.grid, 'C') && isOnBoard(userOcean.grid, 'D') && isOnBoard(userOcean.grid, 'S')){
+            std::cout<<"You have placed all your ships!"<<'\n';
+            do{
+                std::cout<<"Would you like to proceed with the game or continue moving your ships? (\"P\" for proceed, \"C\" for continue)";
+                std::cin>>proceed;
+                proceed=(char)toupper(proceed);
+            }while(proceed!='P' && proceed!='C');
 
-    } while (shipType!='A' && shipType!='B' && shipType!='C' && shipType!='D' && shipType!='S' && shipType!='F');
+            if (proceed=='P') shipType = 'F';
+            else shipType = ' ';
+        }
+        else shipType = ' ';
+    }while (shipType != 'F');
     
     return 0;
 }
@@ -108,8 +148,14 @@ void moveShip(char ocean[10][10], char shipType, int uSize){
 
                 do{
                    std::cout<<"Which column would you like the back of the ship to be in (1-10)?: ";
-                    std::cin>>startCol;
+                   std::cin>>startCol;
 
+                    if (std::cin.fail()) {
+                    std::cin.clear(); // reset fail state
+                    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // discard bad input
+                    std::cout << "Invalid input. Please enter a number between 1 and 10.\n";
+                    startCol = -1; // force loop to continue
+                    }
                 } while (startCol <1 || startCol > 10);
                 
 
@@ -147,8 +193,14 @@ void moveShip(char ocean[10][10], char shipType, int uSize){
             if (orientation == 'V'){
 
                 do{
-                std::cout<<"Which column would you like the ship to be in (from 1-10)?: ";
-                std::cin>>startCol;
+                    std::cout<<"Which column would you like the ship to be in (from 1-10)?: ";
+                    std::cin>>startCol;
+
+                    if (std::cin.fail()) {
+                        std::cin.clear(); // reset fail state
+                        std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // discard bad input
+                        startCol = -1; // force loop to continue
+                    }
                 }while ((startCol < 1) || (startCol > 10));
 
                 std::cout<<"You picked column: ";
@@ -159,11 +211,11 @@ void moveShip(char ocean[10][10], char shipType, int uSize){
                 std::cin>>rowInp;
                 rowInp = toupper(rowInp);
                 startRow = rowInp - 63;
-                }while ((startRow < 1) || (startRow > 10));
+                }while ((startRow < 2) || (startRow > 11));
 
                 std::cout<<"You picked row: "<<startRow<<std::endl;
                 
-                if((uSize + startRow <= 11)&&(startRow - uSize >= 0)){
+                if((uSize + startRow <= 12)&&(startRow - uSize >= 0)){
                     do{
                     std::cout<<"which direction would you like the ship to lay in? Up (U) or Down (D)?: ";
                     std::cin>>direction;
@@ -172,11 +224,11 @@ void moveShip(char ocean[10][10], char shipType, int uSize){
 
                     if (direction == 'U')
                     {
-                        startRow++;
                         endRow = startRow-uSize;
                     }
                     else
                     {
+                        startRow--;
                         endRow = startRow+uSize;
                     }
                 }
@@ -216,6 +268,23 @@ void editBoardVertical(char ocean[10][10], char shipType, int startRow, int endR
     }
 }
 
+bool isOnBoard(char ocean[10][10], char ship){
+    for (int i=0;i<10;i++){
+        for (int j=0;j<10;j++){
+            if (ocean[i][j]==ship) return true;
+        }
+    }
+    return false;
+}
+
+void clear(char ocean[10][10], char ship){
+    for (int i=0;i<10;i++){
+        for (int j=0;j<10;j++){
+            if (ocean[i][j]==ship) ocean[i][j]=' ';
+        }
+    }
+    drawBoard(ocean);
+}
 void drawBoard(char ocean[10][10])
 {
     int i, j;
