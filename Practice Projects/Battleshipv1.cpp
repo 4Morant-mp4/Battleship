@@ -1,11 +1,10 @@
 #include <iostream>
 #include <limits>
 
-// 6/24/26 - The loop is now fixed. Players can put ships infinitely if they choose or continue the game.
-// Fixed some small placement issues and a previous misspelling
-// Also if the player tries to move a ship already on the board, the code will stop them
-// Code will also stop the player if they have moved all their ships. The method used is a bit annoying for the player but it's a good start
-// Next i need to design the isValidSpace() method to ensure no overlapping ships
+// 7/8/26 - Fixed the player setboard. Ships can no longer overlap.
+// Originally wanted a separate method for checking if a space is valid, but it seems easier to do that in the placement methods
+// Next I would like to figure out how to move the methods to different files just to clean things up a bit.
+// I believe the ship placement methods and draw board can be relocated under the Board struct
 // After that, we can begin coding a simple AI that randomly places ships.
 
 void instructions();
@@ -15,6 +14,7 @@ void editBoardVertical(char ocean[10][10], char shipType, int startRow, int endR
 void moveShip(char ocean[10][10], char shipType, int size);
 bool isOnBoard(char ocean[10][10], char ship);
 void clear(char ocean[10][10], char shipType);
+//bool isValidSpace(char ocean[10][10], int startRow, int startCol, int endCol, int endRow, char orientation, char direction);
 
 struct Board {
     char grid[10][10];
@@ -249,22 +249,60 @@ void moveShip(char ocean[10][10], char shipType, int uSize){
 }
 
 void editBoardHorizontal(char ocean[10][10], char shipType, int startRow, int startCol, int endCol, int size, char orientation, char direction){
-    // need to implement a board check that sees if there is enough space in row to fit ship type. Will make another method for this.
+    int count=0;
+
     if (direction == 'L'){
-        for (int i=endCol-1; i<startCol-1; i++) ocean[startRow-1][i] = shipType;
+        for (int i=endCol-1; i<startCol-1; i++){
+            if (ocean[startRow-1][i] == ' '){
+                ocean[startRow-1][i] = shipType;
+            }
+            else{
+                count++;
+            }
+        } 
     }
     else{
-     for (int i=startCol-1; i<endCol-1; i++) ocean[startRow-1][i] = shipType;   
+        for (int i=startCol-1; i<endCol-1; i++){
+            if (ocean[startRow-1][i]==' '){
+                ocean[startRow-1][i] = shipType;
+            }
+            else{
+                count++;
+            }
+        }
+
     }
-    
+    if (count>0){
+        clear(ocean, shipType);
+        std::cout<<'\n'<<"This space is occupied. Please choose another."<<'\n';
+    }   
 }
 void editBoardVertical(char ocean[10][10], char shipType, int startRow, int endRow, int startCol, int size, char orientation, char direction){
-    // need to implement a board check that sees if there is enough space in row to fit ship type. Will make another method for this.
+    int count;
     if (direction == 'U'){
-        for (int i=endRow-1; i<startRow-1; i++) ocean[i][startCol-1] = shipType;
+        for (int i=endRow-1; i<startRow-1; i++){
+            if (ocean[i][startCol-1]==' '){
+                ocean[i][startCol-1] = shipType;
+            }
+            else{
+                count++;
+            }
+        }
     }
     else{
-        for (int i=startRow-1; i<endRow-1; i++) ocean[i][startCol-1] = shipType;  
+        for (int i=startRow-1; i<endRow-1; i++){
+            if (ocean[i][startCol-1]==' '){
+                ocean[i][startCol-1] = shipType;
+            }
+            else{
+                count++;
+            }
+             
+        }   
+    }
+    if (count>0){
+        clear(ocean, shipType);
+        std::cout<<'\n'<<"This space is occupied. Please choose another."<<'\n';
     }
 }
 
@@ -289,7 +327,7 @@ void drawBoard(char ocean[10][10])
 {
     int i, j;
 
-    std::cout << "Your Ship Setup:\n";
+    std::cout << '\n' << "Your Ship Setup:\n";
     std:: cout<< "    "<< "  1   2   3   4   5   6   7   8   9   10"<<'\n'; //column names
     for (i = 0; i < 10; i++) {
         switch (i){ //This makes the row names
@@ -338,6 +376,19 @@ void drawBoard(char ocean[10][10])
     }
 
 }
+
+/*bool isValidSpace(char ocean[10][10], int startRow, int startCol, int endCol, int endRow, char orientation, char direction){
+    if (orientation == 'H'){
+        if (direction == 'L'){
+            for (int i=endCol-1; i<startCol-1; i++){
+                if (ocean)
+            }  
+        }
+        
+    }
+    
+    return false;
+}*/
 
 void instructions()
 {
