@@ -3,10 +3,11 @@
 #include "Boards.h"
 #include <limits>
 
-// 7/9/26 - Everything is in separate tabs now.
-// Refuses to launch with play button
-// When i launch with the terminal command it works, but it's not drawing the board for some reason
-// Will fix later
+// 7/10/26 -- Everything works great and has been separated and organized neatly!
+// Also fixed index numbers so the code processes indexes from 0-9 (just to make it a bit easier to read)
+// Minor issue with the "You pick column: " producing one less than the actual chosen column. Just an aesthetic bug. fix later
+// We can finally begin working on the random AI
+// Post game implementation I would like to figure out how to implement save files to continue the game later.
 
 int main()
 {
