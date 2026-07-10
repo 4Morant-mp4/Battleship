@@ -12,6 +12,7 @@ Board::Board() {
 void Board::moveShip(char ocean[10][10], char shipType, int uSize){
     char rowInp, orientation, direction;
     int startRow, endRow, startCol, endCol;
+    uSize--;
     do{
                 std::cout<<"Which orientation would you like? Type \'H\' for horizontal or \'V\' for vertical: ";
                 std::cin>>orientation;
@@ -24,8 +25,8 @@ void Board::moveShip(char ocean[10][10], char shipType, int uSize){
                 std::cout<<"Which row would you like the ship to be in (from A-J)?: ";
                 std::cin>>rowInp;
                 rowInp = toupper(rowInp);
-                startRow = rowInp - 64;
-                }while ((startRow < 1) || (startRow > 10));
+                startRow = rowInp - 65;
+                }while ((startRow < 0) || (startRow > 9));
 
                 std::cout<<"You picked row: ";
                 std::cout<<rowInp<<std::endl;
@@ -33,18 +34,19 @@ void Board::moveShip(char ocean[10][10], char shipType, int uSize){
                 do{
                    std::cout<<"Which column would you like the back of the ship to be in (1-10)?: ";
                    std::cin>>startCol;
+                   startCol--;
 
                     if (std::cin.fail()) {
                     std::cin.clear(); // reset fail state
                     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // discard bad input
                     std::cout << "Invalid input. Please enter a number between 1 and 10.\n";
-                    startCol = -1; // force loop to continue
+                    startCol -=2; // force loop to continue
                     }
-                } while (startCol <1 || startCol > 10);
+                } while (startCol <0 || startCol > 9);
                 
 
-                std::cout<<"You picked column: "<<startCol<<std::endl;
-                if ((uSize + startCol <= 11)&&(startCol - uSize >= 0)){
+                std::cout<<"You picked column: "<<startCol++<<std::endl;
+                if ((uSize + startCol <= 9)&&(startCol - uSize >= 0)){
                     do{
                     std::cout<<"which direction would you like to the ship to lay in? Left (L) or Right (R)?: ";
                     std::cin>>direction;
@@ -53,7 +55,6 @@ void Board::moveShip(char ocean[10][10], char shipType, int uSize){
 
                     if (direction == 'L')
                     {
-                        startCol++;
                         endCol = startCol-uSize;
                     }
                     else
@@ -61,10 +62,9 @@ void Board::moveShip(char ocean[10][10], char shipType, int uSize){
                         endCol = startCol+uSize;
                     }
                 }
-                else if (startCol + uSize > 11){
+                else if (startCol + uSize > 9){
                     direction = 'L';
                     endCol = startCol - uSize;
-                    startCol++;
                 }
                 else if (startCol - uSize < 0){
                     direction = 'R';
@@ -79,27 +79,28 @@ void Board::moveShip(char ocean[10][10], char shipType, int uSize){
                 do{
                     std::cout<<"Which column would you like the ship to be in (from 1-10)?: ";
                     std::cin>>startCol;
+                    startCol--;
 
                     if (std::cin.fail()) {
                         std::cin.clear(); // reset fail state
                         std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n'); // discard bad input
-                        startCol = -1; // force loop to continue
+                        startCol -=2; // force loop to continue
                     }
-                }while ((startCol < 1) || (startCol > 10));
+                }while ((startCol < 0) || (startCol > 9));
 
                 std::cout<<"You picked column: ";
-                std::cout<<startCol<<std::endl;
+                std::cout<<startCol++<<std::endl;
 
                 do{
                 std::cout<<"Which row would you like the back of the ship to be in (from A-J)?: ";
                 std::cin>>rowInp;
                 rowInp = toupper(rowInp);
-                startRow = rowInp - 63;
-                }while ((startRow < 2) || (startRow > 11));
+                startRow = rowInp - 65;
+                }while ((startRow < 0) || (startRow > 9));
 
-                std::cout<<"You picked row: "<<startRow<<std::endl;
+                std::cout<<"You picked row: "<<rowInp<<std::endl;
                 
-                if((uSize + startRow <= 12)&&(startRow - uSize >= 0)){
+                if((uSize + startRow <= 9)&&(startRow - uSize >= 0)){
                     do{
                     std::cout<<"which direction would you like the ship to lay in? Up (U) or Down (D)?: ";
                     std::cin>>direction;
@@ -112,11 +113,10 @@ void Board::moveShip(char ocean[10][10], char shipType, int uSize){
                     }
                     else
                     {
-                        startRow--;
                         endRow = startRow+uSize;
                     }
                 }
-                else if (startRow + uSize > 11){
+                else if (startRow + uSize > 9){
                     direction = 'U';
                     endRow = startRow - uSize;
                 }
@@ -136,9 +136,9 @@ void Board::editBoardHorizontal(char ocean[10][10], char shipType, int startRow,
     int count=0;
 
     if (direction == 'L'){
-        for (int i=endCol-1; i<startCol-1; i++){
-            if (ocean[startRow-1][i] == ' '){
-                ocean[startRow-1][i] = shipType;
+        for (int i=endCol; i<=startCol; i++){
+            if (ocean[startRow][i] == ' '){
+                ocean[startRow][i] = shipType;
             }
             else{
                 count++;
@@ -146,9 +146,9 @@ void Board::editBoardHorizontal(char ocean[10][10], char shipType, int startRow,
         } 
     }
     else{
-        for (int i=startCol-1; i<endCol-1; i++){
-            if (ocean[startRow-1][i]==' '){
-                ocean[startRow-1][i] = shipType;
+        for (int i=startCol; i<=endCol; i++){
+            if (ocean[startRow][i]==' '){
+                ocean[startRow][i] = shipType;
             }
             else{
                 count++;
@@ -163,11 +163,12 @@ void Board::editBoardHorizontal(char ocean[10][10], char shipType, int startRow,
 }
 
 void Board::editBoardVertical(char ocean[10][10], char shipType, int startRow, int endRow, int startCol, int size, char orientation, char direction){
-    int count;
+    int count=0;
+
     if (direction == 'U'){
-        for (int i=endRow-1; i<startRow-1; i++){
-            if (ocean[i][startCol-1]==' '){
-                ocean[i][startCol-1] = shipType;
+        for (int i=endRow; i<=startRow; i++){
+            if (ocean[i][startCol]==' '){
+                ocean[i][startCol] = shipType;
             }
             else{
                 count++;
@@ -175,9 +176,9 @@ void Board::editBoardVertical(char ocean[10][10], char shipType, int startRow, i
         }
     }
     else{
-        for (int i=startRow-1; i<endRow-1; i++){
-            if (ocean[i][startCol-1]==' '){
-                ocean[i][startCol-1] = shipType;
+        for (int i=startRow; i<=endRow; i++){
+            if (ocean[i][startCol]==' '){
+                ocean[i][startCol] = shipType;
             }
             else{
                 count++;

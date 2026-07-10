@@ -17,9 +17,7 @@
             "options": {
                 "cwd": "${workspaceFolder}/Practice Projects/BattleshipFiles"
             },
-            "problemMatcher": [
-                "$gcc"
-            ],
+            "problemMatcher": ["$gcc"],
             "group": {
                 "kind": "build",
                 "isDefault": true
